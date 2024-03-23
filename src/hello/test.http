@@ -1,0 +1,24 @@
+### modify @baseUrl with the URL value from command 'kubectl get ksvc'
+
+@baseUrl=http://hello.default.10.98.21.142.sslip.io
+
+###
+
+GET {{baseUrl}}?hello=world HTTP/2.1
+
+###
+
+POST {{baseUrl}} HTTP/2.1
+Content-Type: application/json
+
+{
+  "hello": "darkness my old friend"
+}
+
+###
+
+GET {{baseUrl}}/health/readiness HTTP/2.1
+
+###
+
+GET {{baseUrl}}/health/liveness HTTP/2.1

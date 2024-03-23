@@ -1,0 +1,7 @@
+specVersion: 0.36.0
+name: hello
+runtime: go
+registry: notnew77
+created: 2024-03-23T11:12:19.801939423+01:00
+build:
+  builder: pack
