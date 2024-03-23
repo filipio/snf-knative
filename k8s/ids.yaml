@@ -1,0 +1,9 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: ids
+spec:
+  template:
+    spec:
+      containers:
+        - image: docker.io/notnew77/ids

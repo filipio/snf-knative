@@ -1,6 +1,6 @@
 ### modify @baseUrl with the URL value from command 'kubectl get ksvc'
 
-@baseUrl=http://hello.default.10.98.21.142.sslip.io
+@baseUrl=http://ids.default.10.98.21.142.sslip.io
 
 ###
 
