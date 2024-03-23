@@ -3,7 +3,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/kitabisa/teler-waf"
@@ -82,18 +81,9 @@ func main() {
 
 	// Create a new handler using the handler method of the Teler instance
 	// and pass in the myHandler function for the route we want to protect.
-	// app := telerMiddleware.Handler(myHandler)
+	app := telerMiddleware.Handler(myHandler)
 
-	log.Print("teler-waf set up...")
+	fmt.Println("server started at :8081")
 	// Use the app handler as the handler for the route.
-	// http.ListenAndServe("127.0.0.1:3000", app)
-
-	log.Print("serving container started...")
-	http.HandleFunc("/", handler)
-	log.Fatal(http.ListenAndServe(":8881", nil))
-}
-
-func handler(w http.ResponseWriter, r *http.Request) {
-	log.Println("serving container received a request.")
-	fmt.Fprintln(w, "hello from serving container!")
+	http.ListenAndServe(":8081", app)
 }
