@@ -1,4 +1,3 @@
-// main.go
 package main
 
 import (
@@ -11,9 +10,15 @@ import (
 )
 
 var myHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("received request")
 	// This is the handler function for the route that we want to protect
 	// with teler-waf's security measures.
-	w.Write([]byte("hello world"))
+	// Print headers of request
+	for k, v := range r.Header {
+		fmt.Fprintf(w, "%s: %v\n", k, v)
+	}
+	fmt.Println("Request URI: ", r.RequestURI)
+	w.Write([]byte("hello darkness"))
 })
 
 var rejectHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -82,7 +87,7 @@ func main() {
 	// Create a new handler using the handler method of the Teler instance
 	// and pass in the myHandler function for the route we want to protect.
 	app := telerMiddleware.Handler(myHandler)
-
+	// todo: check if this is actually working (meaning image is not stale)
 	fmt.Println("server started at :8081")
 	// Use the app handler as the handler for the route.
 	http.ListenAndServe(":8081", app)

@@ -1,12 +1,12 @@
 apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
-  name: ids
+  name: cache
   namespace: default
 spec:
   template:
     spec:
       containers:
-        - image: docker.io/notnew77/ids:latest
+        - image: docker.io/notnew77/cache:latest
           ports:
-          - containerPort: 8081
+          - containerPort: 8080
