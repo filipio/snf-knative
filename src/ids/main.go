@@ -11,10 +11,13 @@ import (
 	"github.com/kitabisa/teler-waf/threat"
 )
 
-var myHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	// read "SUCCESSORS" env var
-	// if it is not set, return 500
+func handleError(w http.ResponseWriter, successor string, err string) {
+	errMsg := "Error sending POST request to " + successor + " : " + err
+	fmt.Println(errMsg)
+	http.Error(w, "Error sending POST request to "+successor+" : "+err, http.StatusInternalServerError)
+}
 
+var myHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	functionName := os.Getenv("FUNCTION_NAME")
 	if functionName == "" {
 		http.Error(w, "functionName variable not set", http.StatusInternalServerError)
@@ -22,10 +25,6 @@ var myHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	}
 
 	successors := os.Getenv("SUCCESSORS")
-	if successors == "" {
-		http.Error(w, "successors variable not set", http.StatusInternalServerError)
-		return
-	}
 
 	// split it by comma
 	successorsNames := strings.Split(successors, ",")
@@ -33,19 +32,28 @@ var myHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 	requestBody := "ping"
 
-	for _, successor := range successorsNames {
-		// send a POST request to each successor
-		if response, err := Post(successor, requestBody); err != nil {
-			errMsg := "Error sending POST request to " + successor + " : " + err.Error()
-			fmt.Println(errMsg)
-			http.Error(w, "Error sending POST request to "+successor+" : "+err.Error(), http.StatusInternalServerError)
-		} else {
-			fmt.Println("Response from ", successor, ": ", response)
+	if len(successorsNames) > 0 {
+		for _, successor := range successorsNames {
+			if successor == "" {
+				continue
+			}
+			fmt.Printf("sending request to '%s'", successor)
+			// send a POST request to each successor
+			if statusCode, response, err := Post(successor, requestBody); err != nil {
+				handleError(w, successor, err.Error())
+			} else {
+				if statusCode != 200 {
+					handleError(w, successor, response)
+					return
+				}
+				fmt.Println("Response from ", successor, ": ", response)
+			}
 		}
 	}
 
 	// return 200 with "success" response
 	w.Write([]byte("success"))
+
 })
 
 var rejectHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

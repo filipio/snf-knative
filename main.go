@@ -12,7 +12,7 @@ import (
 type JsonMap map[string]interface{}
 
 func run(command string, args []string) (string, error) {
-	fmt.Println("Running command:", command)
+	fmt.Println("Running command:", command, args)
 
 	output, err := exec.Command(command, args...).Output()
 	if err != nil {
@@ -21,7 +21,7 @@ func run(command string, args []string) (string, error) {
 	return string(output), nil
 }
 
-func cacheK8sDefinition(functionName string, successors []string) string {
+func cacheK8sDefinition(imageType string, functionName string, successors []string) string {
 	return fmt.Sprintf(`
 apiVersion: serving.knative.dev/v1
 kind: Service
@@ -32,14 +32,14 @@ spec:
   template:
     spec:
       containers:
-        - image: docker.io/notnew77/cache:latest
+        - image: docker.io/notnew77/%s:latest
           ports:
           - containerPort: 8080
           env:
           - name: FUNCTION_NAME
             value: "%s"
           - name: SUCCESSORS
-            value: "%s"`, functionName, functionName, strings.Join(successors, ","))
+            value: "%s"`, functionName, imageType, functionName, strings.Join(successors, ","))
 }
 
 func writeToFile(filename string, data string) error {
@@ -57,9 +57,9 @@ func writeToFile(filename string, data string) error {
 	return nil
 }
 
-func readConfig() (JsonMap, error) {
+func readJsonConfig(path string) (JsonMap, error) {
 	// read config.json file
-	fileBytes, err := os.ReadFile("config.json")
+	fileBytes, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
@@ -75,14 +75,25 @@ func readConfig() (JsonMap, error) {
 }
 
 func main() {
-	config, err := readConfig()
+	fmt.Println("deleting all ksvc resources in default namespace...")
+	result, _ := run("kubectl", []string{"delete", "ksvc", "--all", "-n", "default"})
+	fmt.Println(result)
+
+	config, err := readJsonConfig("config.json")
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Println(config)
 
-	graph := config["graph"].(map[string]interface{})
+	graphNumber := int(config["graph_number"].(float64))
+
+	graphConfig, graphConfigError := readJsonConfig(fmt.Sprintf("config/graphs/%d.json", graphNumber))
+	if graphConfigError != nil {
+		panic(graphConfigError)
+	}
+
+	graph := graphConfig["graph"].(map[string]interface{})
 
 	for key, value := range graph {
 		functionName := key
@@ -93,9 +104,12 @@ func main() {
 			successorsStrings[i] = successor.(string)
 		}
 
+		functionType := config["function_type"].(string)
+		fmt.Println("Function type:", functionType)
+
 		// fmt.Println(cacheK8sDefinition(functionName, successorsStrings))
 
-		writeToFile("k8s_resource.yaml", cacheK8sDefinition(functionName, successorsStrings))
+		writeToFile("k8s_resource.yaml", cacheK8sDefinition(functionType, functionName, successorsStrings))
 		result, err := run("kubectl", []string{"apply", "-f", "k8s_resource.yaml"})
 		fmt.Println(result)
 

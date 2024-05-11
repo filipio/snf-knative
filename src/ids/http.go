@@ -9,18 +9,18 @@ import (
 
 // type JsonMap map[string]any
 
-func Post(url string, body string) (string, error) {
+func Post(url string, body string) (int, string, error) {
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(body)))
 	if err != nil {
 		log.Fatal(err)
-		return "", err
+		return 0, "", err
 	}
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatal(err)
-		return "", err
+		return 0, "", err
 	}
 
 	defer resp.Body.Close()
@@ -28,8 +28,8 @@ func Post(url string, body string) (string, error) {
 	responseBodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatal(err)
-		return "", err
+		return 0, "", err
 	}
 
-	return string(responseBodyBytes), nil
+	return resp.StatusCode, string(responseBodyBytes), nil
 }

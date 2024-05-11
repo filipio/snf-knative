@@ -1,0 +1,14 @@
+{
+    "graph": {
+        "f1": ["http://f2.default.10.99.236.6.sslip.io", "http://f3.default.10.99.236.6.sslip.io"],
+        "f2": ["http://f4.default.10.99.236.6.sslip.io", "http://f5.default.10.99.236.6.sslip.io", "http://f6.default.10.99.236.6.sslip.io"], 
+        "f3": ["http://f4.default.10.99.236.6.sslip.io", "http://f5.default.10.99.236.6.sslip.io", "http://f6.default.10.99.236.6.sslip.io"],
+        "f4": ["http://f7.default.10.99.236.6.sslip.io", "http://f10.default.10.99.236.6.sslip.io"],
+        "f5": ["http://f7.default.10.99.236.6.sslip.io"],
+        "f6": ["http://f8.default.10.99.236.6.sslip.io"],
+        "f7": ["http://f9.default.10.99.236.6.sslip.io"],
+        "f8": ["http://f9.default.10.99.236.6.sslip.io", "http://f10.default.10.99.236.6.sslip.io"],
+        "f9": [],
+        "f10": []
+    }
+}

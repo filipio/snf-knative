@@ -2,7 +2,7 @@
 apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
-  name: f3
+  name: f9
   namespace: default
 spec:
   template:
@@ -13,6 +13,6 @@ spec:
           - containerPort: 8080
           env:
           - name: FUNCTION_NAME
-            value: "f3"
+            value: "f9"
           - name: SUCCESSORS
             value: ""

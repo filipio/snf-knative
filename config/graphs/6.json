@@ -1,0 +1,8 @@
+{
+    "graph": {
+        "f1": ["http://f2.default.10.99.236.6.sslip.io", "http://f3.default.10.99.236.6.sslip.io"],
+        "f2": ["http://f4.default.10.99.236.6.sslip.io"], 
+        "f3": [],
+        "f4": [] 
+    }
+}
