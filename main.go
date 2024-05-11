@@ -121,4 +121,10 @@ func main() {
 		}
 
 	}
+
+	// delete file k8s_resource.yaml
+	err = os.Remove("k8s_resource.yaml")
+	if err != nil {
+		panic(err)
+	}
 }

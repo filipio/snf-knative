@@ -20,10 +20,14 @@ type Response struct {
 	Value float64 `json:"value"`
 }
 
-func handleError(w http.ResponseWriter, successor string, err string) {
+func handleError(w http.ResponseWriter, successor string, err string, statusCode int) {
 	errMsg := "Error sending POST request to " + successor + " : " + err
 	fmt.Println(errMsg)
-	http.Error(w, "Error sending POST request to "+successor+" : "+err, http.StatusInternalServerError)
+
+	// return the same status code
+	w.WriteHeader(statusCode)
+	msg := "Error sending POST request to " + successor + " : " + err
+	w.Write([]byte(msg))
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
@@ -49,10 +53,10 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			fmt.Printf("sending request to '%s'", successor)
 			// send a POST request to each successor
 			if statusCode, response, err := Post(successor, requestBody); err != nil {
-				handleError(w, successor, err.Error())
+				handleError(w, successor, err.Error(), http.StatusInternalServerError)
 			} else {
 				if statusCode != 200 {
-					handleError(w, successor, response)
+					handleError(w, successor, response, statusCode)
 					return
 				}
 				fmt.Println("Response from ", successor, ": ", response)
