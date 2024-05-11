@@ -107,13 +107,9 @@ func main() {
 		functionType := config["function_type"].(string)
 		fmt.Println("Function type:", functionType)
 
-		// fmt.Println(cacheK8sDefinition(functionName, successorsStrings))
-
 		writeToFile("k8s_resource.yaml", cacheK8sDefinition(functionType, functionName, successorsStrings))
 		result, err := run("kubectl", []string{"apply", "-f", "k8s_resource.yaml"})
 		fmt.Println(result)
-
-		// sleep for 1 seconds
 		time.Sleep(1000 * time.Millisecond)
 
 		if err != nil {
@@ -122,7 +118,6 @@ func main() {
 
 	}
 
-	// delete file k8s_resource.yaml
 	err = os.Remove("k8s_resource.yaml")
 	if err != nil {
 		panic(err)

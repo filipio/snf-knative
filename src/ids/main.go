@@ -66,14 +66,10 @@ func main() {
 	// Create a new instance of the Teler type using the New function
 	// and configure it using the Options struct.
 	telerMiddleware := teler.New(teler.Options{
-		// Exclude specific threats from being checked by the teler-waf.
 		Excludes: []threat.Threat{
 			threat.BadReferrer,
 			threat.BadCrawler,
 		},
-		// Specify whitelisted URIs (path & query parameters), headers,
-		// or IP addresses that will always be allowed by the teler-waf
-		// with DSL expressions.
 		Whitelists: []string{
 			`request.Headers matches "(curl|Go-http-client|okhttp)/*" && threat == BadCrawler`,
 			`request.URI startsWith "/wp-login.php"`,
@@ -116,14 +112,9 @@ func main() {
 		LogFile: "/tmp/teler.log",
 	})
 
-	// Set the rejectHandler as the handler for the telerMiddleware.
 	telerMiddleware.SetHandler(rejectHandler)
-
-	// Create a new handler using the handler method of the Teler instance
-	// and pass in the myHandler function for the route we want to protect.
 	app := telerMiddleware.Handler(myHandler)
-	// todo: check if this is actually working (meaning image is not stale)
-	fmt.Println("server started at :8081")
-	// Use the app handler as the handler for the route.
-	http.ListenAndServe(":8081", app)
+
+	fmt.Println("server started at :8080")
+	http.ListenAndServe(":8080", app)
 }
