@@ -1,7 +1,8 @@
+
 apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
-  name: cache
+  name: f3
   namespace: default
 spec:
   template:
@@ -12,6 +13,6 @@ spec:
           - containerPort: 8080
           env:
           - name: FUNCTION_NAME
-            value: "cache"
+            value: "f3"
           - name: SUCCESSORS
             value: ""

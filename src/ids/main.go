@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
+	"strings"
 
 	"github.com/kitabisa/teler-waf"
 	"github.com/kitabisa/teler-waf/request"
@@ -10,15 +12,40 @@ import (
 )
 
 var myHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("received request")
-	// This is the handler function for the route that we want to protect
-	// with teler-waf's security measures.
-	// Print headers of request
-	for k, v := range r.Header {
-		fmt.Fprintf(w, "%s: %v\n", k, v)
+	// read "SUCCESSORS" env var
+	// if it is not set, return 500
+
+	functionName := os.Getenv("FUNCTION_NAME")
+	if functionName == "" {
+		http.Error(w, "functionName variable not set", http.StatusInternalServerError)
+		return
 	}
-	fmt.Println("Request URI: ", r.RequestURI)
-	w.Write([]byte("hello darkness"))
+
+	successors := os.Getenv("SUCCESSORS")
+	if successors == "" {
+		http.Error(w, "successors variable not set", http.StatusInternalServerError)
+		return
+	}
+
+	// split it by comma
+	successorsNames := strings.Split(successors, ",")
+	fmt.Println("functionName: ", functionName, " successors: ", successorsNames)
+
+	requestBody := "ping"
+
+	for _, successor := range successorsNames {
+		// send a POST request to each successor
+		if response, err := Post(successor, requestBody); err != nil {
+			errMsg := "Error sending POST request to " + successor + " : " + err.Error()
+			fmt.Println(errMsg)
+			http.Error(w, "Error sending POST request to "+successor+" : "+err.Error(), http.StatusInternalServerError)
+		} else {
+			fmt.Println("Response from ", successor, ": ", response)
+		}
+	}
+
+	// return 200 with "success" response
+	w.Write([]byte("success"))
 })
 
 var rejectHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
