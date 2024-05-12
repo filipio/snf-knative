@@ -20,6 +20,7 @@ spec:
         - image: docker.io/notnew77/{{.function_type}}:latest
           ports:
           - containerPort: 8080
+            {{if eq .protocol "grpc"}}name: "h2c"{{end}}
           resources:
             requests:
               cpu: {{.min_cpu}}

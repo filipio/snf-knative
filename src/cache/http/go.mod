@@ -1,4 +1,4 @@
-module github.com/filipio/snf-knative/src/cache
+module github.com/filipio/snf-knative/src/cache/http
 
 go 1.22.1
 

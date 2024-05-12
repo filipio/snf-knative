@@ -1,0 +1,16 @@
+syntax = "proto3";
+option go_package = "github.com/filipio/snf-knative/src/ids/protos";
+
+
+service Handler {
+  // Sends a greeting
+  rpc Handle (HandleRequest) returns (HandleReply) {}
+}
+
+message HandleRequest {
+  string message = 1;
+}
+
+message HandleReply {
+  string message = 1;
+}

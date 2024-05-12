@@ -1,4 +1,4 @@
-module github.com/filipio/snf-knative/src/ids
+module github.com/filipio/snf-knative/src/ids/http
 
 go 1.22.1
 

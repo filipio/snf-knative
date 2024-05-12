@@ -1,8 +1,9 @@
 {
+    "protocol": "grpc",
     "function_type": "cache",
-    "graph_number": 10,
+    "graph_number": 1,
     "metric": "cpu",
-    "min_scale": "3",
+    "min_scale": "1",
     "max_scale": "5",
     "scale_down_delay": "15m",
     "target_utilization_percentage": "70",

@@ -95,6 +95,10 @@ func main() {
 		panic(err)
 	}
 
+	if config["protocol"] == "grpc" {
+		config["function_type"] = config["function_type"].(string) + "_grpc"
+	}
+
 	fmt.Println(config)
 
 	graphNumber := int(config["graph_number"].(float64))
@@ -126,6 +130,9 @@ func main() {
 			panic(err)
 		}
 
+		fmt.Println("resource definition")
+		fmt.Println(resourceDefinition)
+
 		writeToFile("k8s_resource.yaml", resourceDefinition)
 		result, err := run("kubectl", []string{"apply", "-f", "k8s_resource.yaml"})
 		fmt.Println(result)
@@ -137,8 +144,8 @@ func main() {
 
 	}
 
-	err = os.Remove("k8s_resource.yaml")
-	if err != nil {
-		panic(err)
-	}
+	// err = os.Remove("k8s_resource.yaml")
+	// if err != nil {
+	// 	panic(err)
+	// }
 }

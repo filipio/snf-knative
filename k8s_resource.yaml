@@ -1,0 +1,35 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: f1
+  namespace: default
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/class: "hpa.autoscaling.knative.dev"
+        autoscaling.knative.dev/metric: "cpu"
+        autoscaling.knative.dev/min-scale: "1"
+        autoscaling.knative.dev/max-scale: "5"
+        autoscaling.knative.dev/scale-down-delay: "15m"
+        autoscaling.knative.dev/window: "40s"
+        
+        autoscaling.knative.dev/target-utilization-percentage: "70"
+    spec:
+      containers:
+        - image: docker.io/notnew77/cache_grpc:latest
+          ports:
+          - containerPort: 8080
+            name: "h2c"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 40Mi
+            limits:
+              cpu: 300m
+              memory: 400Mi
+          env:
+          - name: FUNCTION_NAME
+            value: f1
+          - name: SUCCESSORS
+            value: 
