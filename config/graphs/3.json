@@ -1,7 +1,7 @@
 {
     "graph": {
-        "f1" : ["http://f2.default.10.99.236.6.sslip.io"],
-        "f2" : ["http://f3.default.10.99.236.6.sslip.io"], 
+        "f1" : ["f2"],
+        "f2" : ["f3"], 
         "f3" : []
     }
 }

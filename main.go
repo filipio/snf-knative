@@ -1,13 +1,17 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
 	"strings"
+	"text/template"
 	"time"
 )
+
+const successorTemplate = "http://%s.default.10.99.236.6.sslip.io"
 
 type JsonMap map[string]interface{}
 
@@ -21,25 +25,32 @@ func run(command string, args []string) (string, error) {
 	return string(output), nil
 }
 
-func cacheK8sDefinition(imageType string, functionName string, successors []string) string {
-	return fmt.Sprintf(`
-apiVersion: serving.knative.dev/v1
-kind: Service
-metadata:
-  name: %s
-  namespace: default
-spec:
-  template:
-    spec:
-      containers:
-        - image: docker.io/notnew77/%s:latest
-          ports:
-          - containerPort: 8080
-          env:
-          - name: FUNCTION_NAME
-            value: "%s"
-          - name: SUCCESSORS
-            value: "%s"`, functionName, imageType, functionName, strings.Join(successors, ","))
+func successorUrl(successor string) string {
+	return fmt.Sprintf(successorTemplate, successor)
+}
+
+func autoscalerType(metric string) string {
+	if metric == "rps" || metric == "concurrency" {
+		return "kpa"
+	} else {
+		return "hpa"
+	}
+}
+
+func createK8sDefinition(data JsonMap) (string, error) {
+	templ, err := template.ParseFiles("k8s_resource_template.yaml")
+	if err != nil {
+		return "", err
+	}
+
+	var buffer bytes.Buffer
+	err = templ.Execute(&buffer, data)
+
+	if err != nil {
+		return "", err
+	}
+
+	return buffer.String(), nil
 }
 
 func writeToFile(filename string, data string) error {
@@ -101,13 +112,21 @@ func main() {
 
 		successorsStrings := make([]string, len(successors))
 		for i, successor := range successors {
-			successorsStrings[i] = successor.(string)
+			successorsStrings[i] = successorUrl(successor.(string))
 		}
 
-		functionType := config["function_type"].(string)
-		fmt.Println("Function type:", functionType)
+		fmt.Println("Function type:", config["function_type"].(string))
 
-		writeToFile("k8s_resource.yaml", cacheK8sDefinition(functionType, functionName, successorsStrings))
+		config["successors"] = strings.Join(successorsStrings, ",")
+		config["function_name"] = functionName
+		config["autoscaler_type"] = autoscalerType(config["metric"].(string))
+
+		resourceDefinition, err := createK8sDefinition(config)
+		if err != nil {
+			panic(err)
+		}
+
+		writeToFile("k8s_resource.yaml", resourceDefinition)
 		result, err := run("kubectl", []string{"apply", "-f", "k8s_resource.yaml"})
 		fmt.Println(result)
 		time.Sleep(1000 * time.Millisecond)

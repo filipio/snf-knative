@@ -5,6 +5,18 @@ metadata:
   namespace: default
 spec:
   template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/class: "hpa.autoscaling.knative.dev" # autoscaler type, kpa (rps, concurrency) or hpa (cpu, memory)
+        autoscaling.knative.dev/metric: "rps"
+        autoscaling.knative.dev/target: "1" # scale if more than 1 request per second
+        autoscaling.knative.dev/min-scale: "3" # have at least 3
+        autoscaling.knative.dev/max-scale: "5" # have at most 5
+        autoscaling.knative.dev/initial-scale: "1" # min to become ready (not useful)
+        autoscaling.knative.dev/activation-scale: "5" # when scaling from 0 (not useful)
+        autoscaling.knative.dev/scale-down-delay: "15m" # delay to scale down
+        autoscaling.knative.dev/window: "40s" # window to aggregate metrics
+        autoscaling.knative.dev/target-utilization-percentage: "70" # target utilization percentage
     spec:
       containers:
         - image: docker.io/notnew77/cache:latest
@@ -15,3 +27,10 @@ spec:
             value: "cache"
           - name: SUCCESSORS
             value: ""
+        resources:
+          requests:
+            cpu: 100m
+            memory: 40Mi
+          limits:
+            cpu: 300m
+            memory: 400Mi

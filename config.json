@@ -1,4 +1,14 @@
 {
-    "graph_number": 1,
-    "function_type": "ids"
+    "function_type": "cache",
+    "graph_number": 10,
+    "metric": "cpu",
+    "min_scale": "3",
+    "max_scale": "5",
+    "scale_down_delay": "15m",
+    "target_utilization_percentage": "70",
+    "window": "40s",
+    "min_cpu": "100m",
+    "max_cpu": "300m",
+    "min_memory": "40Mi",
+    "max_memory": "400Mi"
 }
