@@ -1,20 +1,20 @@
 apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
-  name: f1
+  name: f12
   namespace: default
 spec:
   template:
     metadata:
       annotations:
-        autoscaling.knative.dev/class: "hpa.autoscaling.knative.dev"
-        autoscaling.knative.dev/metric: "cpu"
+        autoscaling.knative.dev/class: "kpa.autoscaling.knative.dev"
+        autoscaling.knative.dev/metric: "rps"
         autoscaling.knative.dev/min-scale: "1"
         autoscaling.knative.dev/max-scale: "5"
         autoscaling.knative.dev/scale-down-delay: "15m"
         autoscaling.knative.dev/window: "40s"
+        autoscaling.knative.dev/target: "5"
         
-        autoscaling.knative.dev/target-utilization-percentage: "70"
     spec:
       containers:
         - image: docker.io/notnew77/cache_grpc:latest
@@ -30,6 +30,6 @@ spec:
               memory: 400Mi
           env:
           - name: FUNCTION_NAME
-            value: f1
+            value: f12
           - name: SUCCESSORS
-            value: 
+            value: http://f13.default.10.99.236.6.sslip.io,http://f14.default.10.99.236.6.sslip.io

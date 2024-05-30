@@ -16,9 +16,9 @@ type Payload struct {
 	ID int `json:"id"`
 }
 
-type Response struct {
-	Value float64 `json:"value"`
-}
+// type Response struct {
+// 	Value float64 `json:"value"`
+// }
 
 func handleError(w http.ResponseWriter, successor string, err string, statusCode int) {
 	errMsg := "Error sending POST request to " + successor + " : " + err
@@ -56,7 +56,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 				handleError(w, successor, err.Error(), http.StatusInternalServerError)
 			} else {
 				if statusCode != 200 {
-					handleError(w, successor, response, statusCode)
+					handleError(w, successor, response["message"].(string), statusCode)
 					return
 				}
 				fmt.Println("Response from ", successor, ": ", response)
