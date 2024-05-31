@@ -1,0 +1,26 @@
+{
+    "policies": [
+        {
+            "name": "proactive",
+            "metric": "rps",
+            "scale_down_delay": "1m",
+            "target": 50,
+            "window": "6s"
+        },
+        {
+            "name": "reactive",
+            "metric": "rps",
+            "scale_down_delay": "10m",
+            "target": "80",
+            "window": "30s"
+        },
+        {
+            "name": "resource-optimized",
+            "metric": "cpu",
+            "window": "20s",
+            "min_cpu": "50m",
+            "max_cpu": "200m",
+            "target_utilization_percentage": 80
+        }
+    ]
+}

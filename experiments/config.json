@@ -1,0 +1,1 @@
+{"function_type":"cache","graph_number":3,"max_cpu":"300m","max_memory":"400Mi","max_scale":"5","metric":"rps","min_cpu":"100m","min_memory":"40Mi","min_scale":"1","name":"reactive","protocol":"http","scale_down_delay":"10m","target":"80","window":"30s"}

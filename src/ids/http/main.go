@@ -111,10 +111,15 @@ func main() {
 		// Specify the file path to use for logging.
 		LogFile: "/tmp/teler.log",
 	})
+	fmt.Println(telerMiddleware)
 
-	telerMiddleware.SetHandler(rejectHandler)
-	app := telerMiddleware.Handler(myHandler)
+	http.HandleFunc("/", myHandler)
+	fmt.Println("Listening on port 8080")
+	http.ListenAndServe(":8080", nil)
 
-	fmt.Println("server started at :8080")
-	http.ListenAndServe(":8080", app)
+	// telerMiddleware.SetHandler(rejectHandler)
+	// app := telerMiddleware.Handler(myHandler)
+
+	// fmt.Println("server started at :8080")
+	// http.ListenAndServe(":8080", app)
 }
